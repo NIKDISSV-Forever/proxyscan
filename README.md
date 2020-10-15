@@ -8,5 +8,6 @@
 
 # Использование:
 
-```from proxies import proxy```
-```proxy_list = proxy.get()```
+```from proxyscan import proxy```
+
+```proxy_list = proxy.scan()```

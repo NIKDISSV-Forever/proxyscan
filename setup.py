@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 __content_type__ = "text/markdown"
 __url__ = "https://github.com/NIKDISSV-Forever/proxyscan"
 
-VERSION = (0, 0, 3)
+VERSION = (0, 0, 4)
 __version__ = '.'.join(map(str, VERSION[0:3]))
 
 with open("README.md", "r") as frm:

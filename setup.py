@@ -22,7 +22,7 @@ setup (
     url = __url__,
     packages = find_packages(),
     classifiers = ["Programming Language :: Python :: 3",
-"#License :: AGPL-3.0-only",
+#"License :: AGPL-3.0-only",
 "Operating System :: OS Independent"],
     python_requires='>=3.2',
 )

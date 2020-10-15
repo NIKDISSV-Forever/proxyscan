@@ -4,7 +4,7 @@
 
 # Установка
 
-```pip install ???```
+```pip install --index-url https://test.pypi.org/simple --no-deps proxyscan-io-api```
 
 # Использование:
 

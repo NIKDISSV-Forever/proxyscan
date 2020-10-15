@@ -12,7 +12,7 @@ with open("README.md", "r") as frm:
 __description__ = "Получи список прокси, с множеством параметров, с помощью API."
 
 setup (
-    name = 'proxyscan-api',
+    name = 'proxyscan-api-NIKDISSV',
     version = __version__,
     author = 'NIKDISSV',
     author_email = 'nikdissv.contact@gmail.com',

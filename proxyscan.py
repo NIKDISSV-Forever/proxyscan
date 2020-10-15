@@ -201,7 +201,6 @@ class proxy:
 				lim = 20
 			pp = choice(prxl)
 			proxx = {'http': pp}
-			print(proxx)
 			if logs_print:
 				print(pp)
 			if logs_file and pp:

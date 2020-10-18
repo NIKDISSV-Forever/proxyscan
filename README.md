@@ -15,6 +15,7 @@ git clone https://github.com/NIKDISSV-Forever/proxyscan.git; cd proxyscan; pytho
 # Использование:
 
 ```from proxyscan import proxyscan```
+
 ```proxy = proxyscan.proxy```
 
 ```proxy_list = proxy.scan()```

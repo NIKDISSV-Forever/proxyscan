@@ -57,3 +57,24 @@ pip install --index-url https://test.pypi.org/simple --no-deps proxyscan-io-api
 Пример:
 
 ```scan(port=80)```
+
+## uptime - Насколько надежно работает прокси.
+Варианты:
+
+```scan(uptime=1-100)```
+
+Пример:
+
+```scan(uptime=50)```
+
+Также, можно указать и больше 100-а, например 400, но вряд-ли вы получите результат.
+
+## country - Страна прокси.
+Пример:
+
+```scan(country='US,FR')```
+
+## not_country - Избегать стран прокси.
+Пример:
+
+```scan(not_country='CN,NL')```

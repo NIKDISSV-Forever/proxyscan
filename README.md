@@ -48,3 +48,12 @@ pip install --index-url https://test.pypi.org/simple --no-deps proxyscan-io-api
 Пример:
 
 ```scan(last_check=3600)```
+
+## port - Прокси с определенным портом.
+Варианты:
+
+```scan(port=Любое число)```
+
+Пример:
+
+```scan(port=80)```

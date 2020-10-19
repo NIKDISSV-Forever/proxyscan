@@ -10,7 +10,12 @@ git clone https://github.com/NIKDISSV-Forever/proxyscan.git; cd proxyscan; pytho
 
 Или:
 
-git clone https://github.com/NIKDISSV-Forever/proxyscan.git
+
+git clone https://github.com/NIKDISSV-Forever/proxyscan/ ../usr/lib/python3.8/site-packages/proxyscan __Директория python__
+
+
+mv ../usr/lib/python3.8/site-packages/proxyscan/proxyscan.py ..; rm -rf ../usr/lib/python3.8/site-packages/proxyscan/
+
 
 Или:
 

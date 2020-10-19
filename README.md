@@ -39,3 +39,12 @@ pip install --index-url https://test.pypi.org/simple --no-deps proxyscan-io-api
 Варианты:
 
 ```scan(type='http' / 'https' / 'socks4' / 'socks5')```
+
+## last_check - Время последней проверки прокси в секундах.
+Варианты:
+
+```scan(last_check=Любое число)```
+
+Пример:
+
+```scan(last_check=3600)```

@@ -4,13 +4,19 @@
 
 # Установка
 
+
 pkg/apt install git
+
 
 git clone https://github.com/NIKDISSV-Forever/proxyscan.git; cd proxyscan; python setup.py install; cd ..; rm -rf proxyscan
 
 Или:
 
-```pip install --index-url https://test.pypi.org/simple --no-deps proxyscan-io-api```
+git clone https://github.com/NIKDISSV-Forever/proxyscan.git
+
+Или:
+
+pip install --index-url https://test.pypi.org/simple --no-deps proxyscan-io-api
 
 # Использование:
 

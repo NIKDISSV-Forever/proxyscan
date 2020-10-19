@@ -4,9 +4,7 @@
 
 # Установка
 
-
 pkg/apt install git
-
 
 git clone https://github.com/NIKDISSV-Forever/proxyscan.git; cd proxyscan; python setup.py install; cd ..; rm -rf proxyscan
 
@@ -25,3 +23,19 @@ pip install --index-url https://test.pypi.org/simple --no-deps proxyscan-io-api
 ```proxy = proxyscan.proxy```
 
 ```proxy_list = proxy.scan()```
+
+
+# Аргументы:
+
+Функция ```scan``` имеет множество аргументов, для кастомизации прокси.
+
+
+## level - Уровень анонимности.
+Варианты:
+
+```scan(level='transparent' / 'anonymous' / 'elite')```
+
+## type - Протокол прокси.
+Варианты:
+
+```scan(type='http' / 'https' / 'socks4' / 'socks5')```

@@ -7,7 +7,7 @@ from math import ceil
 
 class proxy:
 	
-	def scan(type='http', level=None, port=None, ping=None, last_check=None, uptime=None, country=None, not_country=None, limit=20, proxy=False, logs_print=False, write_to_file=(False, 'proxy.txt'), logs_file=(False, 'log.log')):
+	def scan(type='http', level=None, port=None, ping=None, last_check=None, uptime=None, country=None, not_country=None, limit=20, proxy=False, logs_print=False, logs_file=(False, 'log.log'), write_to_file=(False, 'proxy.txt')):
 
 		if type:
 			type = '&type='+type

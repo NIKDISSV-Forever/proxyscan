@@ -100,7 +100,7 @@ pip install --index-url https://test.pypi.org/simple --no-deps proxyscan-io-api
 
 
 ## proxy - использовать прокси при отправке запроса ```bool```.
-Принимает bool значение т.е:
+Принимает ```bool``` значение т.е:
 
 ```scan(proxy=1 / True)``` - Прокси будет использоваться.
 
@@ -114,8 +114,15 @@ pip install --index-url https://test.pypi.org/simple --no-deps proxyscan-io-api
 
 Использование прокси при запросе, вовсе не обязательно, и только замедлит скорость работы.
 
+## user_agent = использовать ли user-agent при отправке запроса. ```bool```
+
+Принимает значение ```bool```, т.е
+
+```1 / True``` - использовать.
+```0 / False``` - не использовать.
+
 ## logs_print - Отображать ли действия скрипта, в консоли ```bool```.
-Принимает bool значение т.е:
+Принимает ```bool``` значение т.е:
 
 ```scan(logs_print=1 / True)``` - Отображать.
 
@@ -128,7 +135,7 @@ pip install --index-url https://test.pypi.org/simple --no-deps proxyscan-io-api
 ## logs_file - Логировать ли действия скрипта в файле ```tuple``` / ```list``` / ```bool```.
 Принимает список/кортеж состоящий из 2-х элементов.
 
-Первый элемент - значение bool, т.е
+Первый элемент - значение ```bool```, т.е
 
 ```1 / True``` - записывать.
 ```0 / False``` - не записывать.
@@ -146,3 +153,19 @@ pip install --index-url https://test.pypi.org/simple --no-deps proxyscan-io-api
 Пример:
 
 ```scan(logs_file=1)```
+
+## write_to_file - записывать ли список полученных прокси в файл ```tuple``` / ```list``` / ```bool```.
+Принимает список/кортеж состоящий из 2-х элементов.
+
+Первый элемент - значение ```bool```, т.е
+
+```1 / True``` - записывать.
+**```0 / False```** - не записывать.
+
+Второй элемент - ```str``` название файла.
+
+По умолчанию название файла 'proxy.txt' т.е
+
+Можно указать так: ```scan(write_to_file=1)```
+
+Или же так: ```scan(write_to_file=(True, 'file_with_proxy.txt'))```

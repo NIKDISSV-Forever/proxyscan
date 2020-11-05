@@ -98,6 +98,15 @@ pip install --index-url https://test.pypi.org/simple --no-deps proxyscan-io-api
 
 ```scan(not_country='CN,NL')```
 
+## timeout - максимальное время ответа после отправки запроса ```int``` / ```float```.
+
+По умолчанию значение 3 (секунды)
+
+При указании некорректного значения, timeout назначается 30 (секунд).
+
+Пример:
+
+```scan(timeout=2.6)```
 
 ## proxy - использовать прокси при отправке запроса ```bool```.
 Принимает ```bool``` значение т.е:

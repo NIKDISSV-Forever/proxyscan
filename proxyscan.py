@@ -1,13 +1,49 @@
-from requests import get
+from os import system as cmd
 from threading import Thread
 from logging import basicConfig, info, INFO 
 from random import choice
 from time import time
 from math import ceil
+#...
+try:
+	from requests import get
+except ModuleNotFoundError:
+	print("--- pip install requests ---")
+	cmd('pip install requests')
+	print("--- pip install requests ---")
+	from requests import get
+
+try:
+	from fake_useragent import UserAgent
+except ModuleNotFoundError:
+	print("--- pip install fake-useragent ---")
+	cmd("pip install fake-useragent")
+	print("--- pip install fake-useragent ---")
+	from fake_useragent import UserAgent
+#...
+
+global ua
+ua = UserAgent()
 
 class proxy:
 	
-	def scan(type='http', level=None, port=None, ping=None, last_check=None, uptime=None, country=None, not_country=None, limit=20, proxy=False, logs_print=False, logs_file=(False, 'log.log'), write_to_file=(False, 'proxy.txt')):
+	def scan(
+	type='http',
+	level=None, 
+	port=None, 
+	ping=None, 
+	last_check=None, 
+	uptime=None, 
+	country=None, 
+	not_country=None, 
+	limit=20, 
+	timeout=3, 
+	proxy=False,
+	user_agent=True,
+	logs_print=False, 
+	logs_file=(False, 'log.log'),
+	write_to_file=(False, 'proxy.txt')
+				):
 
 		if type:
 			type = '&type='+type
@@ -38,6 +74,17 @@ class proxy:
 				port = ''
 		else:
 			port = ''
+		
+		if timeout:
+			try:
+				timeout = float(timeout)
+			except:
+				timeout = 30
+		
+		if user_agent:
+			headers = {"User-Agent": ua.random}
+		else:
+			headers = {"User-Agent": None}
 		
 		if ping:
 			try:
@@ -140,13 +187,15 @@ class proxy:
 		so_link = f'http://www.proxyscan.io/api/proxy?&format=txt{type}{level}{port}{ping}{last_check}{uptime}{country}{not_country}'		
 		if logs_print:
 			print(so_link)
+			print(headers)
 		if logs_file:
 			info(so_link)
+			info(headers)
 		
 		def scan_1_list(main_link, lim, proxx):
 			while 1:
 				try:
-					result = get(main_link + f'&limit={lim}', proxies=proxx, timeout=1).text.split('\n')
+					result = get(main_link + f'&limit={lim}', proxies=proxx, timeout=timeout, headers=headers).text.split('\n')
 					result = result[0:len(result)-1]
 					if result == []:
 						main_link = 'http://www.proxyscan.io/api/proxy?&format=txt'
@@ -177,7 +226,7 @@ class proxy:
 		if proxy:
 			while 1:
 				try:
-					prxl = get('http://www.proxyscan.io/api/proxy?&format=txt&type=http&limit=20&uptime=100', timeout=5).text.split('\n')
+					prxl = get('http://www.proxyscan.io/api/proxy?&format=txt&type=http&limit=20&uptime=100', timeout=timeout, headers=headers).text.split('\n')
 				except Exception as Error:
 					if logs_print:
 						print(Error)

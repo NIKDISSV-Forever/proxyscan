@@ -8,17 +8,13 @@ from math import ceil
 try:
 	from requests import get
 except ModuleNotFoundError:
-	print("--- pip install requests ---")
 	cmd('pip install requests')
-	print("--- pip install requests ---")
 	from requests import get
 
 try:
 	from fake_useragent import UserAgent
 except ModuleNotFoundError:
-	print("--- pip install fake-useragent ---")
 	cmd("pip install fake-useragent")
-	print("--- pip install fake-useragent ---")
 	from fake_useragent import UserAgent
 #...
 
@@ -43,7 +39,7 @@ class proxy:
 	logs_print=False, 
 	logs_file=(False, 'log.log'),
 	write_to_file=(False, 'proxy.txt')
-				):
+			):
 
 		if type:
 			type = '&type='+type
@@ -283,7 +279,4 @@ class proxy:
 
 		return rslt
 
-"""
-На самом деле я русский, доксы просто на английском привычнее писать
-"""
 #NIKDISSV

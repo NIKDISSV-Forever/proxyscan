@@ -1,7 +1,11 @@
 from os import remove
 from sys import stdout
 
-from urllib import request
+try:
+    from urllib.request import urlopen
+except ImportError:
+    from urllib2 import urlopen
+
 from json import load, dump
 
 from time import time
@@ -76,7 +80,7 @@ class api():
 
         not_country=None, n_c=None, _country=None, _c=None, C=None,
 
-    ) -> str:
+    ):
 
         """
 
@@ -203,7 +207,7 @@ class api():
             return False
 
 
-    def _country_test(self, cc, ss: str):
+    def _country_test(self, cc, ss):
         if type(cc) is list or type(cc) is tuple:
             self.required_link += ss
             for one in cc:
@@ -307,9 +311,10 @@ class api():
             if self.end_with:
                 return self.end_with
 
+
     def _get_proxies_s(self):
         try:
-            resp = request.urlopen(self.required_link)
+            resp = urlopen(self.required_link)
             self.result.extend(resp.read().decode("UTF-8").split('\n')[:-1])
         except Exception as Error:
             self.end_with = Error
@@ -317,9 +322,10 @@ class api():
                 stdout.write(str(Error)+'\n')
             return
     
+
     def _get_proxies_d(self):
         try:
-            resp = request.urlopen(self.required_link)
+            resp = urlopen(self.required_link)
         except Exception as Error:
             self.end_with = Error
             if self.STDOUT:

@@ -1,17 +1,17 @@
 from os import remove
-from sys import stdout
+from sys import stdout, argv
 
 try:
-    from urllib.request import urlopen
+    from urllib.request import urlopen, Request
 except ImportError:
-    from urllib2 import urlopen
+    from urllib2 import urlopen, Request
 
 from json import load, dump
 
 from time import time
 from threading import Thread, ThreadError
 
-class api():
+class api(object):
 
     LEVELS = ("transparent", "anonymous", "elite")
     TYPES = ("http", "https", "socks4", "socks5")
@@ -19,7 +19,6 @@ class api():
     UPTIME = tuple(range(1, 101))
     JSON_FILE_NAME = "tmp.result.json"
     STDOUT = bool()
-    TIME = 0
 
     with open("tmp.FILE_HANDLE.txt", 'w') as f:
         FILE_HANDLE = type(f)
@@ -41,10 +40,9 @@ class api():
             type list, tuple or type dict or type str
         """
 
-        self.api_link = api_link
+        TIME = 0
 
-        if not ret_format in (list, tuple, dict, str):
-            ret_format = list
+        self.api_link = api_link
 
         self.format = ret_format
 
@@ -124,10 +122,27 @@ class api():
 
 
         if level in self.LEVELS or lvl in self.LEVELS:
+
             if level in self.LEVELS:
                 self.required_link += "&level=" + str(level)
             elif lvl in self.LEVELS:
                 self.required_link += "&level=" + str(lvl)
+
+        elif self._is_int(level) or self._is_int(lvl):
+
+            if self._is_int(level):
+
+                if level >= len(self.LEVELS):
+                    self.required_link += "&level=" + str(self.LEVELS[-1])
+                elif level >= 0:
+                    self.required_link += "&level=" + str(self.LEVELS[level])
+
+            elif self._is_int(lvl):
+
+                if lvl >= len(self.LEVELS):
+                    self.required_link += "&level=" + str(self.LEVELS[-1])
+                elif lvl >= 0:
+                    self.required_link += "&level=" + str(self.LEVELS[lvl])
 
         
         if type_ in self.TYPES or protocol in self.TYPES:
@@ -135,6 +150,22 @@ class api():
                 self.required_link += "&type=" + str(type_)
             elif protocol in self.TYPES:
                 self.required_link += "&type=" + str(protocol)
+        
+        elif self._is_int(type_) or self._is_int(protocol):
+
+            if self._is_int(type_):
+
+                if type_ >= len(self.TYPES):
+                    self.required_link += "&type=" + str(self.TYPES[-1])
+                elif type_ >= 0:
+                    self.required_link += "&type=" + str(self.TYPES[type_])
+
+            elif self._is_int(protocol):
+                
+                if protocol >= len(self.LEVELS):
+                    self.required_link += "&level=" + str(self.TYPES[-1])
+                elif protocol >= 0:
+                    self.required_link += "&level=" + str(self.TYPES[protocol])
         
 
         if self._is_int(last_check) or self._is_int(l_c):
@@ -287,7 +318,10 @@ class api():
 
                     else:
                         with open(str(file), 'a') as file:
-                            file.write(sep.join(self.result))
+                            if self._target:
+                                file.write(sep.join(self.result))
+                            else:
+                                self.save_json(file)
 
                 self.TIME = time() - self.TIME
                 if self._target:
@@ -364,3 +398,69 @@ class api():
             if self.STDOUT:
                 stdout.write(str(Error))
             return Error
+
+def argv_to_dict(args):
+    kw = {}
+    for arg in args:
+        arg = arg.split('=')
+        if len(arg) > 1:
+            kw[arg[0]] = arg[-1]
+    print(kw)
+    return kw
+
+
+if __name__ == "__main__":
+
+    DEFAULT_CFG = """[API]
+ret_format=txt
+api_link=https://www.proxyscan.io/api/proxy?
+[PROXIES]
+file=result.txt"""
+
+    try:
+
+        with open("ProxyScanIOAPI.cfg"): pass
+
+    except Exception as Error:
+
+        with open("ProxyScanIOAPI.cfg", 'w') as cfg:
+
+            cfg.write(DEFAULT_CFG)
+
+
+    try:
+
+        from configparser import ConfigParser
+        cfg = ConfigParser()
+        cfg.read("ProxyScanIOAPI.cfg")
+
+    except ImportError:
+
+        from os import system
+        system("pip install configparser")
+
+        try:
+
+            from configparser import ConfigParser
+            cfg = ConfigParser()
+            cfg.read("ProxyScanIOAPI.cfg")
+
+        except ImportError as Err:
+
+            print(Err)
+            cfg = {
+                "API": {
+                    "ret_format": "json",
+                    "api_link": "https://www.proxyscan.io/api/proxy?"
+                },
+                "PROXIES": {
+                    "file": "result.txt"
+                }
+            }
+
+
+    ps = api(**cfg["API"])
+
+
+    ps.get_url(**argv_to_dict(argv[1:]))
+    ps.get_proxies(**cfg["PROXIES"])

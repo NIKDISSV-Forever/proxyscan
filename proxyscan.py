@@ -11,6 +11,7 @@ from json import load, dump
 from time import time
 from threading import Thread, ThreadError
 
+
 class api(object):
 
     LEVELS = ("transparent", "anonymous", "elite")
@@ -29,25 +30,24 @@ class api(object):
         api_link="https://www.proxyscan.io/api/proxy?",
         ret_format=list,
     ):
-
         """
-        
+
         api_link:
             some URL (str)
                 Domain to which the request will be sent
-        
+
         ret_format:
             type list, tuple or type dict or type str
         """
 
-        TIME = 0
+        self.TIME = time()
 
         self.api_link = api_link
 
         self.format = ret_format
 
         if ((self.format is list or self.format is tuple)
-            or (self.format is str or self.format == "txt")):
+                or (self.format is str or self.format == "txt")):
             self.required_link = self.api_link + "format=txt"
             self._target = True
         elif self.format is dict or self.format == "json":
@@ -56,7 +56,6 @@ class api(object):
         else:
             self.required_link = self.api_link + "format=txt"
             self._target = True
-
 
     def get_url(
         self,
@@ -79,21 +78,20 @@ class api(object):
         not_country=None, n_c=None, _country=None, _c=None, C=None,
 
     ):
-
         """
 
     level or lvl:
         transparent, anonymous, elite (Const LEVELS)
             Anonymity Level
-    
+
     type_ or protocol:
         http, https, socks4, socks5 (Const TYPES)
             Proxy Protocol
-    
+
     last_check or l_c:
         Any Number (int)
             Seconds the proxy was last checked
-    
+
     port or pt:
         Any Number (Const PORTS)
             Proxies with a specific port
@@ -101,7 +99,7 @@ class api(object):
     ping or pg:
         Any Number (int)
             How fast you get a response after you've sent out a request
-    
+
     limit or max_ or count:
         Any Number (int)
             How many proxies to list.
@@ -109,17 +107,16 @@ class api(object):
     uptime or ut:
         1 - 100 (Const UPTIME)
             How reliably a proxy has been running
-    
+
     country or c:
         Example: "US,FR" (str or list str or tuple str)
             Country of the proxy
-    
+
     not_country or n_c or _country or _c or C:
         example: ["CN", "NL"] (str or list str or tuple str)
             Avoid proxy countries
-        
-        """
 
+        """
 
         if level in self.LEVELS or lvl in self.LEVELS:
 
@@ -144,13 +141,12 @@ class api(object):
                 elif lvl >= 0:
                     self.required_link += "&level=" + str(self.LEVELS[lvl])
 
-        
         if type_ in self.TYPES or protocol in self.TYPES:
             if type_ in self.TYPES:
                 self.required_link += "&type=" + str(type_)
             elif protocol in self.TYPES:
                 self.required_link += "&type=" + str(protocol)
-        
+
         elif self._is_int(type_) or self._is_int(protocol):
 
             if self._is_int(type_):
@@ -161,33 +157,29 @@ class api(object):
                     self.required_link += "&type=" + str(self.TYPES[type_])
 
             elif self._is_int(protocol):
-                
+
                 if protocol >= len(self.LEVELS):
                     self.required_link += "&level=" + str(self.TYPES[-1])
                 elif protocol >= 0:
                     self.required_link += "&level=" + str(self.TYPES[protocol])
-        
 
         if self._is_int(last_check) or self._is_int(l_c):
             if self._is_int(last_check):
                 self.required_link += "&last_check=" + str(last_check)
             elif self._is_int(l_c):
                 self.required_link += "&last_check=" + str(l_c)
-        
 
         if port in self.PORTS or pt in self.PORTS:
             if port in self.PORTS:
                 self.required_link += "&port=" + str(port)
             elif pt in self.PORTS:
                 self.required_link += "&port=" + str(pt)
-        
 
         if self._is_int(ping) or self._is_int(pg):
             if self._is_int(ping):
                 self.required_link += "&ping=" + str(ping)
             elif self._is_int(pg):
                 self.required_link += "&ping=" + str(pg)
-        
 
         if self._is_int(limit) or self._is_int(max_) or self._is_int(count):
             if self._is_int(limit):
@@ -198,21 +190,19 @@ class api(object):
                 self.end_limit = int(count)
         else:
             self.end_limit = 20
-        
 
         if uptime in self.UPTIME or ut in self.UPTIME:
             if uptime in self.UPTIME:
                 self.required_link += "&uptime=" + str(uptime)
             elif ut in self.UPTIME:
                 self.required_link += "&uptime=" + str(ut)
-            
 
         if country or c:
             if country:
                 self._country_test(country, "&country=")
             elif c:
                 self._country_test(c, "&country=")
-        
+
         if not_country or n_c or _country or _c or C:
             if not_country:
                 self._country_test(not_country, "&not_country=")
@@ -224,9 +214,8 @@ class api(object):
                 self._country_test(_c, "&not_country=")
             elif C:
                 self._country_test(C, "&not_country=")
-        
-        return self.required_link
 
+        return self.required_link
 
     def _is_int(self, obj):
         try:
@@ -237,7 +226,6 @@ class api(object):
                 stdout.write(str(Error)+'\n')
             return False
 
-
     def _country_test(self, cc, ss):
         if type(cc) is list or type(cc) is tuple:
             self.required_link += ss
@@ -246,15 +234,13 @@ class api(object):
             self.required_link = self.required_link[:-1]
         elif type(cc) is str:
             self.required_link += ss + cc
-    
 
     def get_proxies(
         self,
         sep='\n',
         out_format=list,
         file=None,
-        ):
-
+    ):
         """
 
         sep:
@@ -271,11 +257,9 @@ class api(object):
 
         """
 
-
         self.required_link += "&limit=" + str(self.end_limit)
 
         self.result = []
-
 
         self.end_with = None
 
@@ -285,7 +269,7 @@ class api(object):
             target = self._get_proxies_d
 
         while 1:
-            
+
             self.TIME = time()
 
             try:
@@ -303,7 +287,7 @@ class api(object):
                     if type(file) is self.FILE_HANDLE:
 
                         if file.mode[0] == 'w' or file.mode[0] == 'a':
-                            
+
                             if self._target:
                                 file.write(sep.join(self.result))
                             else:
@@ -345,7 +329,6 @@ class api(object):
             if self.end_with:
                 return self.end_with
 
-
     def _get_proxies_s(self):
         try:
             resp = urlopen(self.required_link)
@@ -355,7 +338,6 @@ class api(object):
             if self.STDOUT:
                 stdout.write(str(Error)+'\n')
             return
-    
 
     def _get_proxies_d(self):
         try:
@@ -369,14 +351,13 @@ class api(object):
 
         with open(self.JSON_FILE_NAME, 'w') as json_tmp:
             json_tmp.write(utf8resp)
-            
+
         with open(self.JSON_FILE_NAME) as json_data:
             try:
                 self.result.extend(load(json_data))
             except Exception as Error:
                 if self.STDOUT:
                     stdout.write(str(Error)+'\n')
-
 
     def save_json(self, file):
         try:
@@ -399,6 +380,9 @@ class api(object):
                 stdout.write(str(Error))
             return Error
 
+    def __del__(self):
+        self.TIME = time() - self.TIME
+
 def argv_to_dict(args):
     kw = {}
     for arg in args:
@@ -419,14 +403,14 @@ file=result.txt"""
 
     try:
 
-        with open("ProxyScanIOAPI.cfg"): pass
+        with open("ProxyScanIOAPI.cfg"):
+            pass
 
     except Exception as Error:
 
         with open("ProxyScanIOAPI.cfg", 'w') as cfg:
 
             cfg.write(DEFAULT_CFG)
-
 
     try:
 
@@ -458,9 +442,7 @@ file=result.txt"""
                 }
             }
 
-
     ps = api(**cfg["API"])
-
 
     ps.get_url(**argv_to_dict(argv[1:]))
     ps.get_proxies(**cfg["PROXIES"])

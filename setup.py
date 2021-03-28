@@ -1,28 +1,45 @@
+from sys import argv
+from typing import List, Tuple, Union, Text
 from setuptools import setup, find_packages
 
-__content_type__ = "text/markdown"
-__url__ = "https://github.com/NIKDISSV-Forever/proxyscan"
-__classifiers__ = ["Programming Language :: Python :: 3", "Operating System :: OS Independent"]
 
-VERSION = (0, 1, 0)
-__version__ = '.'.join(map(str, VERSION))
+ClassifiersType = Union[List[Text], Tuple[Text]]
+VersionType = Union[List[int], Tuple[int, int, int]]
 
-with open("README.md", "r", encoding="UTF-8") as frm:
-    __long_description__ = frm.read()
+VERSION: VersionType = 0, 1, 3
+README_FN: Text = "README.md"
 
-__description__ = "Получи список прокси, с множеством параметров, с помощью API."
+__python_requires__: Text = ">=3.7"
+__content_type__: Text = "text/markdown"
+__version__: Text = '.'.join(map(str, VERSION))
+__name__ = "ProxyScanIOApi" if __name__ == "__main__" else __name__
 
-setup (
-    name = 'proxyscanIOApi',
-    version = __version__,
-    author = 'NIKDISSV',
-    author_email = 'nikdissv.contact@gmail.com',
-    description = __description__,
-    long_description = __long_description__,
-    long_description_content_type = __content_type__,
-    url = __url__,
-    packages = find_packages(),
-    classifiers = __classifiers__,
-    #"License :: AGPL-3.0-only"
-    python_requires='>=3.6',
+__author__: Text = "NIKDISSV"
+__email__: Text = "nikdissv.contact@gmail.com"
+__url__: Text = "https://github.com/NIKDISSV-Forever/proxyscan/"
+
+__description__ = __long_description__ = "Получи список прокси, с множеством параметров, с помощью API."
+try:
+    with open(README_FN, encoding="UTF-8") as ReadMe:
+        __long_description__ = ReadMe.read()
+except: pass
+
+
+__classifiers__: ClassifiersType = ["Programming Language :: Python :: 3",
+                                    "Operating System :: OS Independent",
+                                    # "License :: AGPL-3.0-only",
+                                    ]
+
+setup(
+    name=__name__,
+    version=__version__,
+    author=__author__,
+    author_email=__email__,
+    description=__description__,
+    long_description=__long_description__,
+    long_description_content_type=__content_type__,
+    url=__url__,
+    packages=find_packages(),
+    classifiers=__classifiers__,
+    python_requires=__python_requires__,
 )

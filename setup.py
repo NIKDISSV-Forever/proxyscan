@@ -1,4 +1,3 @@
-from sys import argv
 from typing import List, Tuple, Union, Text
 from setuptools import setup, find_packages
 
@@ -12,7 +11,7 @@ README_FN: Text = "README.md"
 __python_requires__: Text = ">=3.7"
 __content_type__: Text = "text/markdown"
 __version__: Text = '.'.join(map(str, VERSION))
-__name__ = "ProxyScanIOApi" if __name__ == "__main__" else __name__
+__name__ = "ProxyScanIOApi"
 
 __author__: Text = "NIKDISSV"
 __email__: Text = "nikdissv.contact@gmail.com"
@@ -22,7 +21,8 @@ __description__ = __long_description__ = "Получи список прокси
 try:
     with open(README_FN, encoding="UTF-8") as ReadMe:
         __long_description__ = ReadMe.read()
-except: pass
+except:
+    pass
 
 
 __classifiers__: ClassifiersType = ["Programming Language :: Python :: 3",

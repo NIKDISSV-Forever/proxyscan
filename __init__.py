@@ -13,8 +13,7 @@ IntendType = Union[None, int, str]
 ResultTuple = Tuple[Union[str, dict]]
 
 
-class GetProxiesError(Exception):
-    pass
+class GetProxiesError(Exception): pass
 
 
 class ProxyScanIO:

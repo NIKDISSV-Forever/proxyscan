@@ -7,15 +7,32 @@
 
 # Установка
 
-`pkg/apt install git python`
+### Linux
 
-`git clone https://github.com/NIKDISSV-Forever/proxyscan.git`
+#### Terminal:
+> apt install git python3 || pkg install git python3
+>
+> git clone https://github.com/NIKDISSV-Forever/proxyscan
+> 
+> cd proxyscan && python3 setup.py install
 
-`cd proxyscan`
 
-`python setup.py install`
+### Windows
 
+*[Download Python3](https://www.python.org/downloads/)*
+
+*[Download Git](https://git-scm.com/download)*
+
+#### cmd:
+> git clone https://github.com/NIKDISSV-Forever/proxyscan
+> 
+> cd proxyscan && python3 setup.py install
 
 # Использование:
 
-```import proxyscan```
+```python3
+from proxyscan import ProxyScanIO
+proxyScanner = ProxyScanIO()
+proxies = proxyScanner.get_proxies()
+print(*proxies, sep="\n")
+```

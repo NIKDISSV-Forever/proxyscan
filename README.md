@@ -26,7 +26,7 @@
 #### cmd:
 > git clone https://github.com/NIKDISSV-Forever/proxyscan
 > 
-> cd proxyscan && python3 setup.py install
+> cd proxyscan && py setup.py install
 
 # Использование:
 

@@ -1,3 +1,5 @@
+__all__ = ['GetProxiesError', 'ProxyScanIO']
+
 from typing import IO, Text, Tuple, Union, SupportsInt
 
 from http.client import HTTPResponse
@@ -6,7 +8,6 @@ from urllib.request import urlopen
 from json import loads, dumps
 from threading import Thread
 
-__all__ = ['GetProxiesError', 'ProxyScanIO']
 
 Numeric = Union[SupportsInt, int, float, str, None]
 PrintFile = Union[None, bool, IO]
@@ -14,7 +15,8 @@ IntendType = Union[None, int, str]
 ResultTuple = Tuple[Union[str, dict]]
 
 
-class GetProxiesError(Exception): pass
+class GetProxiesError(Exception):
+    pass
 
 
 class ProxyScanIO:
@@ -38,7 +40,6 @@ class ProxyScanIO:
                     count: Numeric = None,
                     **kwargs
                     ) -> ResultTuple:
-
         """
 Parameter
             Value
@@ -105,7 +106,8 @@ Not_Country
         if self.print_to is not False:
             if self.use_json:
                 p_result = "["
-                dumped = (dumps(obj, indent=self.indent) for obj in self.result)
+                dumped = (dumps(obj, indent=self.indent)
+                          for obj in self.result)
                 p_result += ", ".join(dumped)
                 p_result += "]"
             else:
@@ -119,18 +121,18 @@ Not_Country
 
         proxies = ()
         with_empty = self.error_with_empty
-        
+
         while len(proxies) < limit[0]:
             try:
                 url = f"{self._end_link}limit={limit[1]}"
                 resp: HTTPResponse = urlopen(url)
                 page_text = resp.read().decode("UTF-8")
-                
+
                 if self.use_json:
                     proxies += tuple(loads(page_text))
                 else:
                     proxies += tuple(page_text.splitlines())
-                
+
                 if len(proxies) == 0:
                     with_empty -= 1
                 self._result += proxies
@@ -139,18 +141,18 @@ Not_Country
                     raise Error
             if not with_empty:
                 raise GetProxiesError("Too many requests were unsuccessful.")
-    
+
     def __make_requests(self) -> None:
-        
+
         self._result = threads = ()
-        
+
         if self._limit:
             integer: Tuple[int] = (1,) * (self._limit // 20)
             non_int: Tuple[float] = self._limit % 20 / 20,
             limit_each = integer + non_int
         else:
             limit_each = None,
-        
+
         for i in limit_each:
             args = ((int(i * 20.),) * 2,) if i else ((1, 20),)
             t = Thread(target=self.__add_result, args=args)

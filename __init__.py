@@ -6,6 +6,7 @@ from urllib.request import urlopen
 from json import loads, dumps
 from threading import Thread
 
+__all__ = ['GetProxiesError', 'ProxyScanIO']
 
 Numeric = Union[SupportsInt, int, float, str, None]
 PrintFile = Union[None, bool, IO]

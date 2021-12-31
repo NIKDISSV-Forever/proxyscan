@@ -71,8 +71,6 @@ class limitedValues(Filter):
 class limitedStringCaseInsensitive(limitedValues):
     def __or__(self, other: limitedValues):  ...  # |
 
-    def __ior__(self, other: limitedValues): ...  # |=
-
 
 class Number(limitedValues):
     values = None

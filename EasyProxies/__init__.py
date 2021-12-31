@@ -3,7 +3,7 @@ from typing import Union, TypeVar
 from urllib.parse import parse_qsl, urlencode, urljoin
 from urllib.request import urlopen
 
-from EasyProxy import filters
+from EasyProxies import filters
 
 __all__ = ('Proxies', 'filters')
 

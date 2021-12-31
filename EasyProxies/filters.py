@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from difflib import get_close_matches
 from typing import Any, Iterable
 from urllib.parse import urlencode
 
@@ -7,11 +8,11 @@ class InvalidValue(Exception):
     pass
 
 
-def to_str(val: Any) -> str:
+def _to_str(val: Any) -> str:
     return val if isinstance(val, str) else val.decode('UTF-8') if isinstance(val, bytes) else str(val)
 
 
-def to_int(val: Any) -> int:
+def _to_int(val: Any) -> int:
     if isinstance(val, int):
         return val
     int_val = int(val)
@@ -44,7 +45,7 @@ class Filter(ABC):
         return '&'.join(self.joins)
 
 
-class limitedValues(Filter, ABC):
+class limitedValues(Filter):
     __slots__ = ()
 
     @property
@@ -52,30 +53,30 @@ class limitedValues(Filter, ABC):
     def values(self):
         pass
 
-    def invalid(self, value) -> InvalidValue:
-        return InvalidValue(f'{repr(value)} not in {repr(self.values)}')
+    def _invalid(self, value) -> InvalidValue:
+        mb = ''
+        if isinstance(value, Iterable):
+            mb = get_close_matches(value, self.values, 1)
+            if mb:
+                mb = f' (Maybe you meant {repr(mb[0])}?)'
+        return InvalidValue(f'{repr(value)} not in {repr(self.values)}{mb}')
 
 
 class limitedStringCaseInsensitive(limitedValues):
     __slots__ = ()
 
-    def __or__(self, other: Filter):
-        return type(self)(','.join(set(self.value.split(',')) | set(other.value.split(','))))
-
-    def __ior__(self, other: Filter):
-        self.value = (self | other).value
-        return self
+    def __or__(self, other: limitedValues):
+        return type(self)(set(self.value.split(',')) | set(other.value.split(',')))
 
     def value_validator(self, value):
         values = []
-        for i, value in enumerate(
-                [el for el in (to_str(value).split(',') if isinstance(value, str) else value)]):
+        for i, value in enumerate(_to_str(value).split(',') if isinstance(value, str) else value):
             if isinstance(value, int):
                 value -= 1
                 value = self.values[value]
-            value = to_str(value).lower()
+            value = _to_str(value).lower()
             if value not in self.values:
-                raise self.invalid(value)
+                raise self._invalid(value)
             values.append(value)
         return ','.join(values)
 
@@ -86,11 +87,11 @@ class Number(limitedValues):
 
     def value_validator(self, value):
         try:
-            value = to_int(value)
+            value = _to_int(value)
         except Exception as Error:
-            raise self.invalid(value) from Error
+            raise self._invalid(value) from Error
         if self.values and value not in self.values:
-            raise self.invalid(value)
+            raise self._invalid(value)
         return value
 
 
@@ -98,7 +99,7 @@ class CC(Filter):
     __slots__ = ()
 
     def value_validator(self, value):
-        values = [to_str(cc).strip() for cc in (value if isinstance(value, Iterable) else to_str(value).split(','))]
+        values = [_to_str(cc).strip() for cc in (value if isinstance(value, Iterable) else _to_str(value).split(','))]
         return ','.join(values)
 
 
@@ -163,4 +164,4 @@ Not_Country = NotCountry
 FormatJSON, FormatTXT = [Format(val) for val in Format.values]
 TypeHTTP, TypeHTTPS, TypeSOCKS4, TypeSOCKS5 = [Type(val) for val in Type.values]
 LevelTRANSPARENT, LevelANONYMOUS, LevelELITE = [Level(val) for val in Level.values]
-TypeSOCKS = Type('socks4,socks5')
+TypeSOCKS = TypeSOCKS4 | TypeSOCKS5

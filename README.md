@@ -73,7 +73,8 @@ class limitedStringCaseInsensitive(limitedValues):
 
 class Number(limitedValues):
     values = None
-    ...
+
+    def value_validator(self, value): ...
 
 
 class CC(Filter):

@@ -4,19 +4,15 @@ from typing import Any, Iterable
 from urllib.parse import urlencode
 
 
-class InvalidValue(Exception):
-    pass
-
-
 def _to_str(val: Any) -> str:
     return val if isinstance(val, str) else val.decode('UTF-8') if isinstance(val, bytes) else str(val)
 
 
 def _to_int(val: Any) -> int:
-    if isinstance(val, int):
-        return val
-    int_val = int(val)
-    return int_val if int_val == val else round(val)
+    return val if isinstance(val, int) else int(val)
+
+
+class InvalidValue(Exception): pass
 
 
 class Filter(ABC):
@@ -55,12 +51,15 @@ class limitedValues(Filter):
         pass
 
     def _invalid(self, value) -> InvalidValue:
-        mb = ''
-        if isinstance(value, Iterable):
-            mb = get_close_matches(value, self.values, 1)
-            if mb:
-                mb = f' (Maybe you meant {repr(mb[0])}?)'
-        return InvalidValue(f'{repr(value)} not in {repr(self.values)}{mb}')
+        mb = not_in = ''
+        print(self.values)
+        if self.values:
+            not_in = f' not in {repr(self.values)}'
+            if isinstance(value, Iterable):
+                mb = get_close_matches(value, self.values, 1)
+                if mb:
+                    mb = f' (Maybe you meant {repr(mb[0])}?)'
+        return InvalidValue(f'{repr(value)}{not_in}{mb}')
 
 
 class limitedStringCaseInsensitive(limitedValues):
@@ -87,10 +86,7 @@ class Number(limitedValues):
     values = None
 
     def value_validator(self, value):
-        try:
-            value = _to_int(value)
-        except Exception as Error:
-            raise self._invalid(value) from Error
+        value = _to_int(value)
         if self.values and value not in self.values:
             raise self._invalid(value)
         return value

@@ -1,38 +1,52 @@
-# ProxyScanIO
+#### Documentation in Russian
 
-Модуль Python с помощью которого вы можете получить список прокси ip:port, любой длины, бесплатно, с множеством параметров для кастомизации.
+> pip install [EasyProxy](https://pypi.org/project/EasyProxy/)
 
-Можно создать кортеж Python или сохранить результаты в файл.
+```python
+# __init__.py
+from EasyProxy import filters
 
-
-# Установка
-
-### Linux
-
-#### Terminal:
-> apt install git python3 || pkg install git python3
->
-> git clone https://github.com/NIKDISSV-Forever/proxyscan
-> 
-> cd proxyscan && python3 setup.py install
+ParamsType = dict[str, Union[str, int]]
+ProxyData = TypeVar('ProxyData', dict[str, Union[str, int, type(None)]], str)
+ListOfProxy = list[ProxyData]
+DEFAULT_FILTERS = filters.FormatTXT
 
 
-### Windows
+class Proxies:
+    __slots__ = ()
+    HOST = 'https://www.proxyscan.io/'
 
-*[Download Python3](https://www.python.org/downloads/)*
+    def __init__(self, default: filters.Filter):
+        """Задаёт фильтры по умолчанию"""
+        ...
 
-*[Download Git](https://git-scm.com/download)*
+    @classmethod
+    def raw_request(cls, params: Union[ParamsType, str]) -> ListOfProxy: ...
 
-#### cmd:
-> git clone https://github.com/NIKDISSV-Forever/proxyscan
-> 
-> cd proxyscan && py setup.py install
+    @classmethod
+    def get(cls, filters: Union[filters.Filter, ParamsType, str] = DEFAULT_FILTERS) -> ListOfProxy: ...
 
-# Использование:
+    @classmethod
+    def download_type(cls, protocol: filters.Type) -> list[str]:
+        """Вернёт список готовых прокси"""
+        ...
+```
 
-```python3
-from proxyscan import ProxyScanIO
-proxyScanner = ProxyScanIO()
-proxies = proxyScanner.get_proxies()
-print(*proxies, sep="\n")
+# Фильтры
+
+Пакет ```EasyProxy.filters```.
+
+Классовая обёртка для https://www.proxyscan.io/api
+
+## Примеры фильтров
+
+```python
+from EasyProxy import *
+
+my_filters = filters.TypeHTTP | filters.TypeHTTPS  # HTTP или HTTPS прокси
+my_filters &= filters.Ping(10) & filters.Uptime(10)  # Пинг не больше 100 и Время безотказной работы 10%
+print(*Proxies.get((my_filters & filters.FormatTXT & filters.Limit(20))), sep='\n')
+"""
+Напечатает до 20-и прокси ip:port каждый с новой строки
+"""
 ```

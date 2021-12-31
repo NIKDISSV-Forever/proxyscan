@@ -1,5 +1,5 @@
 from json import loads
-from typing import Union, TypeVar
+from typing import Union
 from urllib.parse import parse_qsl, urlencode, urljoin
 from urllib.request import urlopen
 
@@ -8,8 +8,7 @@ from EasyProxies import filters
 __all__ = ('Proxies', 'filters')
 
 ParamsType = dict[str, Union[str, int]]
-ProxyData = TypeVar('ProxyData', dict[str, Union[str, int, type(None)]], str)
-ListOfProxy = list[ProxyData]
+ListOfProxy = list[Union[dict[str, Union[str, int, type(None)]], str]]
 
 DEFAULT_FILTERS = filters.FormatTXT
 

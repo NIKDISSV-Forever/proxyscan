@@ -21,7 +21,6 @@ print(*Proxies.get((my_filters & filters.FormatTXT & filters.Limit(20))), sep='\
 from EasyProxies import filters
 
 ParamsType = dict[str, Union[str, int]]
-ProxyData = TypeVar('ProxyData', dict[str, Union[str, int, type(None)]], str)
 ListOfProxy = list[ProxyData]
 DEFAULT_FILTERS = filters.FormatTXT
 
@@ -77,22 +76,20 @@ class Number(limitedValues):
     ...
 
 
-class CC(Filter): ...
+class CC(Filter):
+    def __init__(self, *value): ...
 
 
 class Format(limitedStringCaseInsensitive):
     values = ('json', 'txt')
-    ...
 
 
 class Level(limitedStringCaseInsensitive):
     values = ('transparent', 'anonymous', 'elite')
-    ...
 
 
 class Type(limitedStringCaseInsensitive):
     values = ('http', 'https', 'socks4', 'socks5')
-    ...
 
 
 class LastCheck(Number): ...
@@ -104,14 +101,10 @@ class Port(Number): ...
 class Ping(Number): ...
 
 
-class Limit(Number):
-    values = range(1, 21)
-    ...
+class Limit(Number): values = range(1, 21)
 
 
-class Uptime(Number):
-    values = range(1, 101)
-    ...
+class Uptime(Number): values = range(1, 101)
 
 
 class Country(CC): ...
@@ -128,5 +121,4 @@ FormatJSON, FormatTXT = ...
 TypeHTTP, TypeHTTPS, TypeSOCKS4, TypeSOCKS5 = ...
 LevelTRANSPARENT, LevelANONYMOUS, LevelELITE = ...
 TypeSOCKS = TypeSOCKS4 | TypeSOCKS5
-
 ```

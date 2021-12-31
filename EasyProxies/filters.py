@@ -20,12 +20,13 @@ def _to_int(val: Any) -> int:
 
 
 class Filter(ABC):
-    __slots__ = ('value', 'joins')
+    __slots__ = ('value', 'joins', '__key')
 
     @property
-    @abstractmethod
     def key(self):
-        pass
+        if not hasattr(self, '__key'):
+            self.__key = self.__class__.__name__.lower()
+        return self.__key
 
     @abstractmethod
     def value_validator(self, value):
@@ -98,26 +99,26 @@ class Number(limitedValues):
 class CC(Filter):
     __slots__ = ()
 
+    def __init__(self, *value):
+        super().__init__(value[0] if len(value) == 1 else value)
+
     def value_validator(self, value):
-        values = [_to_str(cc).strip() for cc in (value if isinstance(value, Iterable) else _to_str(value).split(','))]
+        values = [_to_str(cc).strip() for cc in (value.split(',') if isinstance(value, str) else value)]
         return ','.join(values)
 
 
 class Format(limitedStringCaseInsensitive):
     __slots__ = ()
-    key = 'format'
     values = ('json', 'txt')
 
 
 class Level(limitedStringCaseInsensitive):
     __slots__ = ()
-    key = 'level'
     values = ('transparent', 'anonymous', 'elite')
 
 
 class Type(limitedStringCaseInsensitive):
     __slots__ = ()
-    key = 'type'
     values = ('http', 'https', 'socks4', 'socks5')
 
 
@@ -128,29 +129,24 @@ class LastCheck(Number):
 
 class Port(Number):
     __slots__ = ()
-    key = 'port'
 
 
 class Ping(Number):
     __slots__ = ()
-    key = 'ping'
 
 
 class Limit(Number):
     __slots__ = ()
-    key = 'limit'
     values = range(1, 21)
 
 
 class Uptime(Number):
     __slots__ = ()
-    key = 'uptime'
     values = range(1, 101)
 
 
 class Country(CC):
     __slots__ = ()
-    key = 'country'
 
 
 class NotCountry(CC):

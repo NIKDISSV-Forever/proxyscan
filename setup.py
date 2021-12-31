@@ -4,7 +4,7 @@ with open('README.md', encoding='UTF-8') as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="EasyProxy",
+    name="EasyProxies",
 
     version="0.1.0",
 

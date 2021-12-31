@@ -18,9 +18,10 @@ class Proxies:
     __slots__ = ()
     HOST = 'https://www.proxyscan.io/'
 
-    def __init__(self, default: filters.Filter):
+    def __init__(self, default: filters.Filter, host: str = HOST):
         global DEFAULT_FILTERS
         DEFAULT_FILTERS = default
+        self.__class__.HOST = host
 
     @classmethod
     def _urlopen_read(cls, url: str) -> str:

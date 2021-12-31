@@ -29,8 +29,8 @@ DEFAULT_FILTERS = filters.FormatTXT
 class Proxies:
     HOST = 'https://www.proxyscan.io/'
 
-    def __init__(self, default: filters.Filter):
-        """Задаёт фильтры по умолчанию"""
+    def __init__(self, default: filters.Filter, host: str = HOST):
+        """Задаёт фильтры по умолчанию, меняет хост"""
         ...
 
     @classmethod

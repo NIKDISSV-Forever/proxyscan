@@ -1,12 +1,12 @@
-import setuptools
+from setuptools import setup, find_packages
 
 with open('README.md', encoding='UTF-8') as fh:
     long_description = fh.read()
 
-setuptools.setup(
+setup(
     name="EasyProxies",
 
-    version="0.1.2",
+    version="0.1.3",
 
     author="Nikita (NIKDISSV)",
     author_email="nikdissv.forever@protonmail.com",
@@ -17,7 +17,7 @@ setuptools.setup(
 
     url="https://github.com/NIKDISSV-Forever/proxyscan",
 
-    packages=setuptools.find_packages(),
+    packages=find_packages(),
 
     classifiers=[
         'Programming Language :: Python :: 3',

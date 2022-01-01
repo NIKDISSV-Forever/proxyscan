@@ -1,7 +1,9 @@
 from abc import ABC, abstractmethod
 from difflib import get_close_matches
-from typing import Any, Iterable
+from typing import Any, Iterable, TypeVar, Union
 from urllib.parse import urlencode
+
+_T = TypeVar('_T')
 
 
 def _to_str(val: Any) -> str:
@@ -12,34 +14,44 @@ def _to_int(val: Any) -> int:
     return val if isinstance(val, int) else int(val)
 
 
-class InvalidValue(Exception): pass
+class InvalidValue(Exception):
+    pass
 
 
 class Filter(ABC):
-    __slots__ = ('value', 'joins', '__key')
-
-    @property
-    def key(self):
-        if not hasattr(self, '__key'):
-            self.__key = self.__class__.__name__.lower()
-        return self.__key
+    __slots__ = ('value', 'as_dict')
 
     @abstractmethod
     def value_validator(self, value):
         pass
 
-    def __init__(self, value, joins: set = None):
-        self.value = self.value_validator(value)
-        joins = joins or set()
-        joins.add(urlencode({self.key: self.value}))
-        self.joins = joins
+    @classmethod
+    @property
+    def key(cls) -> str:
+        if not hasattr(cls, '__key'):
+            cls.__key = cls.__name__.lower()
+        elif not cls.__key.islower():
+            cls.__key = cls.__key.lower()
+        return cls.__key
 
-    def __and__(self, other):
-        joins = self.joins | other.joins
-        return type(self)(self.value, joins)
+    def __init__(self, *value, joins: dict = None):
+        value = value[0] if len(value) == 1 else value
+        if joins is None:
+            joins = {}
+        self.value = self.value_validator(value)
+        self.as_dict = joins | {self.key: self.value}
+
+    def __and__(self: _T, other) -> _T:
+        return type(self)(self.value, joins=other.as_dict)
+
+    def __bool__(self) -> bool:
+        return bool(self.as_dict)
+
+    def __eq__(self, other) -> bool:
+        return self.as_dict == other.as_dict
 
     def __str__(self) -> str:
-        return '&'.join(self.joins)
+        return urlencode(self.as_dict)
 
 
 class limitedValues(Filter):
@@ -52,7 +64,6 @@ class limitedValues(Filter):
 
     def _invalid(self, value) -> InvalidValue:
         mb = not_in = ''
-        print(self.values)
         if self.values:
             not_in = f' not in {repr(self.values)}'
             if isinstance(value, Iterable):
@@ -65,12 +76,17 @@ class limitedValues(Filter):
 class limitedStringCaseInsensitive(limitedValues):
     __slots__ = ()
 
-    def __or__(self, other: limitedValues):
+    def __or__(self: _T, other: Filter) -> _T:
         return type(self)(set(self.value.split(',')) | set(other.value.split(',')))
 
     def value_validator(self, value):
         values = []
-        for i, value in enumerate(_to_str(value).split(',') if isinstance(value, str) else value):
+        enum_values = value
+        if isinstance(value, str):
+            enum_values = value.split(',')
+        elif not isinstance(value, Iterable):
+            enum_values = value,
+        for i, value in enumerate(enum_values):
             if isinstance(value, int):
                 value -= 1
                 value = self.values[value]
@@ -95,12 +111,8 @@ class Number(limitedValues):
 class CC(Filter):
     __slots__ = ()
 
-    def __init__(self, *value):
-        super().__init__(value[0] if len(value) == 1 else value)
-
     def value_validator(self, value):
-        values = [_to_str(cc).strip() for cc in (value.split(',') if isinstance(value, str) else value)]
-        return ','.join(values)
+        return ','.join(_to_str(cc).strip() for cc in (value.split(',') if isinstance(value, str) else value))
 
 
 class Format(limitedStringCaseInsensitive):
@@ -150,10 +162,31 @@ class NotCountry(CC):
     key = 'not_country'
 
 
+ALL_FILTERS = [Format, Level, Type, LastCheck, Port, Ping, Limit, Uptime, Country, NotCountry]
+
+
+def to_filter(flt: Union[dict[str, Any], Filter] = None, **kwargs) -> Filter:
+    if flt is None:
+        flt = {}
+    if isinstance(flt, Filter):
+        return flt & to_filter(kwargs)
+    result = None
+    flt |= kwargs
+    for k, v in flt.items():
+        for fl in ALL_FILTERS:
+            if fl.key == k.lower():
+                if result:
+                    result &= fl(v)
+                else:
+                    result = fl(v)
+    return result
+
+
+Protocol = Type
 Last_Check = LastCheck
 Not_Country = NotCountry
 
 FormatJSON, FormatTXT = [Format(val) for val in Format.values]
 TypeHTTP, TypeHTTPS, TypeSOCKS4, TypeSOCKS5 = [Type(val) for val in Type.values]
 LevelTRANSPARENT, LevelANONYMOUS, LevelELITE = [Level(val) for val in Level.values]
-TypeSOCKS = TypeSOCKS4 | TypeSOCKS5
+TypeSOCKS = Type('socks4', 'socks5')

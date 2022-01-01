@@ -13,16 +13,27 @@ from EasyProxies import *
 
 my_filters = filters.TypeHTTP | filters.TypeHTTPS  # HTTP или HTTPS прокси
 my_filters &= filters.Ping(10) & filters.Uptime(10)  # Пинг не больше 100 и Время безотказной работы 10%
-print(*Proxies.get((my_filters & filters.FormatTXT & filters.Limit(20))), sep='\n')
+print(*Proxies.get((my_filters & filters.Limit(20))), sep='\n')
+```
+
+_тоже самое что и_
+
+```python
+from EasyProxies import *
+
+print(*Proxies.get(type='http,https', ping=10, uptime=10, limit=20), sep='\n')
 ```
 
 ```python
 # __init__.py
+from typing import Union
 from EasyProxies import filters
 
+__all__ = ('Proxies', 'filters')
+
 ParamsType = dict[str, Union[str, int]]
-ListOfProxy = list[ProxyData]
-DEFAULT_FILTERS = filters.FormatTXT
+ListOfProxy = list[Union[dict[str, Union[str, int, type(None)]], str]]
+DEFAULT_FILTERS: filters.Filter = filters.FormatTXT
 
 
 class Proxies:
@@ -49,16 +60,24 @@ class Proxies:
 Пакет ```EasyProxy.filters```.
 
 ```python
+from abc import ABC, abstractmethod
+from typing import Any, Union
+
 
 class Filter(ABC):
-    key = ...
+    __slots__ = ('value', 'as_dict')
+    key = classmethod(property(...))
 
     @abstractmethod
     def value_validator(self, value): pass
 
-    def __init__(self, value, joins: set = None): ...
+    def __init__(self, *value, joins: dict = None): ...
 
     def __and__(self, other):  ...  # &
+
+    def __bool__(self) -> bool: ...
+
+    def __eq__(self, other) -> bool: ...
 
     def __str__(self) -> str: ...
 
@@ -77,8 +96,7 @@ class Number(limitedValues):
     def value_validator(self, value): ...
 
 
-class CC(Filter):
-    def __init__(self, *value): ...
+class CC(Filter): ...
 
 
 class Format(limitedStringCaseInsensitive):
@@ -114,12 +132,20 @@ class Country(CC): ...
 class NotCountry(CC): ...
 
 
+ALL_FILTERS = [Format, Level, Type, LastCheck, Port, Ping, Limit, Uptime, Country, NotCountry]
+
+
+def dict_to_filter(flt: Union[dict[str, Any], Filter] = None, **kwargs
+                   ) -> Filter: ...
+
+
 # Псевдонимы
+Protocol = Type
 Last_Check = LastCheck
 Not_Country = NotCountry
 
 FormatJSON, FormatTXT = ...
 TypeHTTP, TypeHTTPS, TypeSOCKS4, TypeSOCKS5 = ...
 LevelTRANSPARENT, LevelANONYMOUS, LevelELITE = ...
-TypeSOCKS = TypeSOCKS4 | TypeSOCKS5
+TypeSOCKS = Type('socks4', 'socks5')
 ```

@@ -1,6 +1,6 @@
 from json import loads
-from typing import Union
-from urllib.parse import parse_qsl, urlencode, urljoin
+from typing import Union, Literal
+from urllib.parse import urlencode, urljoin, parse_qsl
 from urllib.request import urlopen
 
 from EasyProxies import filters
@@ -8,19 +8,24 @@ from EasyProxies import filters
 __all__ = ('Proxies', 'filters')
 
 ParamsType = dict[str, Union[str, int]]
-ListOfProxy = list[Union[dict[str, Union[str, int, type(None)]], str]]
-
-DEFAULT_FILTERS = filters.FormatTXT
+ListOfProxy = list[Union[dict[str, Union[str, int, Literal[None]]], str]]
+DEFAULT_FILTERS: filters.Filter = filters.FormatTXT
 
 
 class Proxies:
     __slots__ = ()
     HOST = 'https://www.proxyscan.io/'
 
-    def __init__(self, default: filters.Filter, host: str = HOST):
+    def __init__(self, set_default: Union[filters.Filter, dict] = DEFAULT_FILTERS, set_host: str = HOST):
         global DEFAULT_FILTERS
-        DEFAULT_FILTERS = default
-        self.__class__.HOST = host
+        if not isinstance(set_default, filters.Filter):
+            if not isinstance(set_default, dict):
+                set_default = dict(set_default)
+            set_default = filters.to_filter(set_default)
+        if set_default != DEFAULT_FILTERS:
+            DEFAULT_FILTERS = set_default
+        if set_host != self.HOST:
+            self.__class__.HOST = set_host
 
     @classmethod
     def _urlopen_read(cls, url: str) -> str:
@@ -32,16 +37,28 @@ class Proxies:
 
     @classmethod
     def raw_request(cls, params: Union[ParamsType, str]) -> ListOfProxy:
-        params = dict(parse_qsl(str(params))) if isinstance(params, (str, filters.Filter)) else {
-            i.lower(): k.lower() if isinstance(k, str) else k for i, k in params.items()
-        }
+        if not isinstance(params, dict):
+            if isinstance(params, filters.Filter):
+                params = params.as_dict
+            elif isinstance(params, str):
+                params = parse_qsl(params)
+            else:
+                params = dict(params)
         answer = cls._urlopen_read(cls._join_params(params))
         return loads(answer) if params.get('format', 'json').lower() == 'json' else answer.split('\n')
 
     @classmethod
-    def get(cls, filters: Union[filters.Filter, ParamsType, str] = DEFAULT_FILTERS) -> ListOfProxy:
-        return cls.raw_request(filters)
+    def get(cls, filters_: Union[filters.Filter, ParamsType, str] = None, **kw_filters) -> ListOfProxy:
+        if filters_ is None:
+            filters_ = DEFAULT_FILTERS
+        if isinstance(filters_, filters.Filter):
+            filters_ = filters_.as_dict
+        if kw_filters:
+            filters_ |= kw_filters
+        return cls.raw_request(DEFAULT_FILTERS.as_dict | filters_)
 
     @classmethod
-    def download_type(cls, protocol: filters.Type) -> list[str]:
-        return cls._urlopen_read(urljoin(cls.HOST, f"download?{urlencode({'type': protocol.value})}")).split('\n')
+    def download_type(cls, protocol: Union[filters.Type, str, int]) -> list[str]:
+        if not isinstance(protocol, filters.Type):
+            protocol = filters.Type(protocol)
+        return cls._urlopen_read(urljoin(cls.HOST, f"download?{protocol}")).split('\n')

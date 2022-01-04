@@ -53,6 +53,14 @@ class Proxies:
     def download_type(cls, protocol: filters.Type) -> list[str]:
         """Вернёт список готовых прокси"""
         ...
+
+    @classmethod
+    def generator(cls, *args, perpetual: bool = True, **kwargs) -> Iterator[ListOfProxy]:
+        """
+        Генератор прокси, если perpetual,
+        то будет генерировать по заданным пораметрам вечно.
+        """
+        ...
 ```
 
 # Фильтры

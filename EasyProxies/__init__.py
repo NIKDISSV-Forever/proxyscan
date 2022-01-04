@@ -1,5 +1,5 @@
 from json import loads
-from typing import Union, Literal
+from typing import Union, Literal, Iterator
 from urllib.parse import urlencode, urljoin, parse_qsl
 from urllib.request import urlopen
 
@@ -62,3 +62,17 @@ class Proxies:
         if not isinstance(protocol, filters.Type):
             protocol = filters.Type(protocol)
         return cls._urlopen_read(urljoin(cls.HOST, f"download?{protocol}")).split('\n')
+
+    @classmethod
+    def generator(cls, *args, perpetual: bool = True, **kwargs) -> Iterator[ListOfProxy]:
+        """Proxy generator, if perpetual, it will generate for the given parameters forever"""
+        if perpetual:
+            def generator() -> Iterator[ListOfProxy]:
+                while True:
+                    yield from cls.get(*args, **kwargs)
+        else:
+
+            def generator() -> Iterator[ListOfProxy]:
+                yield from cls.get(*args, **kwargs)
+
+        return generator()

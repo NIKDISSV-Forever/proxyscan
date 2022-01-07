@@ -33,13 +33,13 @@ __all__ = ('Proxies', 'filters')
 
 ParamsType = dict[str, Union[str, int]]
 ListOfProxy = list[Union[dict[str, Union[str, int, type(None)]], str]]
-DEFAULT_FILTERS: filters.Filter = filters.FormatTXT
+DEFAULT_FILTERS: filters.Parameters = filters.FormatTXT
 
 
 class Proxies:
     HOST = 'https://www.proxyscan.io/'
 
-    def __init__(self, default: filters.Filter, host: str = HOST):
+    def __init__(self, default: filters.Parameters, host: str = HOST):
         """Задаёт фильтры по умолчанию, меняет хост"""
         ...
 
@@ -47,7 +47,7 @@ class Proxies:
     def raw_request(cls, params: Union[ParamsType, str]) -> ListOfProxy: ...
 
     @classmethod
-    def get(cls, filters: Union[filters.Filter, ParamsType, str] = DEFAULT_FILTERS) -> ListOfProxy: ...
+    def get(cls, filters: Union[filters.Parameters, ParamsType, str] = DEFAULT_FILTERS) -> ListOfProxy: ...
 
     @classmethod
     def download_type(cls, protocol: filters.Type) -> list[str]:
@@ -68,92 +68,107 @@ class Proxies:
 Пакет ```EasyProxy.filters```.
 
 ```python
-from abc import ABC, abstractmethod
-from typing import Any, Union
+from typing import TypeVar
+
+_T = TypeVar('_T')
 
 
-class Filter(ABC):
-    __slots__ = ('value', 'as_dict')
-    key = classmethod(property(...))
+class Parameters:
+    __slots__ = ('parameters',)
 
-    @abstractmethod
-    def value_validator(self, value): pass
+    def __init__(self, values=None): ...
 
-    def __init__(self, *value, joins: dict = None): ...
-
-    def __and__(self, other):  ...  # &
-
-    def __bool__(self) -> bool: ...
-
-    def __eq__(self, other) -> bool: ...
+    def __and__(self, other): ...
 
     def __str__(self) -> str: ...
 
-
-class limitedValues(Filter):
-    values = ...
+    def __repr__(self) -> str: ...
 
 
-class limitedStringCaseInsensitive(limitedValues):
-    def __or__(self, other: limitedValues):  ...  # |
+class BaseParameter(Parameters):
+    __slots__ = ('__key',)
+
+    @property
+    def key(self) -> str: ...
+
+    def __init__(self, *values): ...
+
+    def __or__(self, other): ...
+
+    def valid_value(self, value: _T) -> set[_T]: ...
 
 
-class Number(limitedValues):
-    values = None
+class LimitedValues(BaseParameter):
+    off = False  # Игнорировать ограничения
 
-    def value_validator(self, value): ...
+    @property
+    def values(self): ...
+
+    def valid_value(self, value): ...
 
 
-class CC(Filter): ...
+class Numbers(BaseParameter):
+    def valid_value(self, value): ...
 
 
-class Format(limitedStringCaseInsensitive):
+class CC:
+    def __contains__(self, item) -> bool: ...  # in
+
+    def __repr__(self) -> str: ...
+
+
+class Format(LimitedValues):
+    __slots__ = ()
     values = ('json', 'txt')
 
 
-class Level(limitedStringCaseInsensitive):
+class Level(LimitedValues):
+    __slots__ = ()
     values = ('transparent', 'anonymous', 'elite')
 
 
-class Type(limitedStringCaseInsensitive):
+class Type(LimitedValues):
+    __slots__ = ()
     values = ('http', 'https', 'socks4', 'socks5')
 
 
-class LastCheck(Number): ...
+class Last_Check(Numbers):
+    __slots__ = ()
 
 
-class Port(Number): ...
+class Port(Numbers):
+    __slots__ = ()
 
 
-class Ping(Number): ...
+class Ping(Numbers):
+    __slots__ = ()
 
 
-class Limit(Number): values = range(1, 21)
+class Limit(Numbers):
+    __slots__ = ()
+    values = range(1, 21)
 
 
-class Uptime(Number): values = range(1, 101)
+class Uptime(Numbers):
+    __slots__ = ()
+    values = range(1, 101)
 
 
-class Country(CC): ...
+class Country(LimitedValues):
+    __slots__ = ()
+    values = CC()
 
 
-class NotCountry(CC): ...
+class Not_Country(Country):
+    __slots__ = ()
 
 
-ALL_FILTERS = [Format, Level, Type, LastCheck, Port, Ping, Limit, Uptime, Country, NotCountry]
-
-
-def dict_to_filter(flt: Union[dict[str, Any], Filter] = None, **kwargs
-                   ) -> Filter: ...
-
-
-# Псевдонимы
 Protocol = Type
-Last_Check = LastCheck
-Not_Country = NotCountry
+LastCheck = Last_Check
+NotCountry = Not_Country
 
-FormatJSON, FormatTXT = ...
-TypeHTTP, TypeHTTPS, TypeSOCKS4, TypeSOCKS5 = ...
-LevelTRANSPARENT, LevelANONYMOUS, LevelELITE = ...
-TypeSOCKS = Type('socks4', 'socks5')
+FormatJSON, FormatTXT = [Format(val) for val in Format.values]
+TypeHTTP, TypeHTTPS, TypeSOCKS4, TypeSOCKS5 = [Type(val) for val in Type.values]
+LevelTRANSPARENT, LevelANONYMOUS, LevelELITE = [Level(val) for val in Level.values]
+TypeSOCKS = Type({'socks4', 'socks5'})
 ```

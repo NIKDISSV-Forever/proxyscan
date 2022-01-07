@@ -45,8 +45,7 @@ class BaseParameter(Parameters):
         return self.__key
 
     def __init__(self, *values):
-        values = values[0] if len(values) == 1 else set(values)
-        values = self.valid_value(values)
+        values = self.valid_value(values[0] if len(values) == 1 else set(values))
         super().__init__({self.key: values})
 
     def __or__(self, other):

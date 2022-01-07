@@ -34,7 +34,8 @@ class Proxies:
     @classmethod
     def raw_request(cls, params: filters.Parameters) -> ListOfProxy:
         answer = cls._urlopen_read(urljoin(cls.HOST, f'api/proxy?{params}'))
-        return loads(answer) if params.parameters.get('format', 'json').lower() == 'json' else answer.splitlines()
+        return loads(answer) if tuple(params.parameters.get('format', ('json',)))[
+                                    0].lower() == 'json' else answer.splitlines()
 
     @classmethod
     def get(cls, filters_: ParamsType = None, **kw_filters) -> ListOfProxy:

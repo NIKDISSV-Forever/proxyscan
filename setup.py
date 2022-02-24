@@ -6,7 +6,7 @@ with open('README.md', encoding='UTF-8') as fh:
 setup(
     name="EasyProxies",
 
-    version="0.1.9",
+    version="1.0.0",
 
     author="Nikita (NIKDISSV)",
     author_email="nikdissv.forever@protonmail.com",
@@ -14,6 +14,7 @@ setup(
     description="A simple and quick way to get a proxy.",
     long_description=long_description,
     long_description_content_type="text/markdown",
+    license_files=['LICENSE'],
 
     url="https://github.com/NIKDISSV-Forever/proxyscan",
 

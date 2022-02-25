@@ -16,7 +16,6 @@ print(*Proxies.get(limit=const.Limit(20), format=const.Format.TXT), sep='\n')
 print(*Proxies.get(limit=20, format='txt'), sep='\n')
 ```
 
-
 Если format='json' (по умолчанию), будет возвращён список из классов ProxyDescriptor
 
 ```python
@@ -53,16 +52,18 @@ class ProxyDescriptor(_AnyDescriptor):
     @property
     def as_requests_proxy(self) -> dict[str, str]:
         """
-        Will result in a view for the proxy in the requests framework.
-        {protocol: f'{protocol}://{ip}:{port}'}
+        Will result in a view for the proxy in the `requests` framework.
+        {'http': host, 'https': host} if is_socks else {protocol: host}
         """
+        ...
+
+    def __str__(self):
+        """Like format='txt'"""
         ...
 
     def __lt__(self, other: ProxyDescriptor) -> bool:
         """Designed for sorting"""
         ...
-
-    def __eq__(self, other): ...
 ```
 
 

@@ -6,7 +6,7 @@ with open('README.md', encoding='UTF-8') as fh:
 setup(
     name="EasyProxies",
 
-    version="1.1.0",
+    version="2.0.0",
 
     author="Nikita (NIKDISSV)",
     author_email="nikdissv.forever@protonmail.com",

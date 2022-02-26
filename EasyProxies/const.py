@@ -7,20 +7,22 @@ _TV = _typing.TypeVar('_TV')
 _TR = _typing.TypeVar('_TR')
 
 
-class _Safe(_abc.ABC):
+class Safe(_abc.ABC):
     @classmethod
     @_abc.abstractmethod
-    def _validator(cls, value: _TV, raises) -> _TR:
-        pass
+    def _validator(cls, value: _TV, raises) -> _TR: pass
 
     def __new__(cls, values: _typing.Union[_TV, _typing.Iterable[_TV]], raises: bool = False
                 ) -> _typing.Union[_TR, tuple[_TR]]:
+        """
+        If the raise True argument raises ValueError with an unsuitable value otherwise it returns DEFAULT or None
+        """
         if not isinstance(values, str) and isinstance(values, _typing.Iterable):
             return tuple(cls._validator(value, raises) for value in values)
         return cls._validator(values, raises)
 
 
-class _SafeStr(_Safe):
+class SafeStr(Safe):
     __slots__ = ()
     ANY: tuple[str] = ()
     DEFAULT: str = None
@@ -37,7 +39,7 @@ class _SafeStr(_Safe):
         return cls.DEFAULT
 
 
-class _SafeRange(_Safe):
+class SafeRange(Safe):
     __slots__ = ()
     MIN: int = 1
     MAX: int
@@ -55,7 +57,7 @@ class _SafeRange(_Safe):
             return cls.MIN
 
 
-class _SafeCountryCode(_Safe):
+class SafeCountryCode(Safe):
     __slots__ = ()
 
     @classmethod
@@ -69,10 +71,10 @@ class _SafeCountryCode(_Safe):
         return
 
 
-class _AnyNumber(int): __slots__ = ()
+class AnyNumber(int): __slots__ = ()
 
 
-class Format(_SafeStr):
+class Format(SafeStr):
     """Format api output"""
     __slots__ = ()
     TXT = 'TXT'  # list[str]
@@ -80,7 +82,7 @@ class Format(_SafeStr):
     ANY = (TXT, JSON)
 
 
-class Level(_SafeStr):
+class Level(SafeStr):
     """Anonymity Level"""
     __slots__ = ()
     TRANSPARENT = 'TRANSPARENT'
@@ -89,7 +91,7 @@ class Level(_SafeStr):
     ANY = DEFAULT = (ELITE, ANONYMOUS, TRANSPARENT)
 
 
-class Type(_SafeStr):
+class Type(SafeStr):
     """Proxy Protocol"""
     __slots__ = ()
     SOCKS4 = 'SOCKS4'
@@ -104,40 +106,40 @@ class Type(_SafeStr):
     ANY = DEFAULT = HTTPs + SOCKS
 
 
-class LastCheck(_AnyNumber):
+class LastCheck(AnyNumber):
     """Seconds the proxy was last checked"""
     __slots__ = ()
 
 
-class Port(_AnyNumber):
+class Port(AnyNumber):
     """Proxies with a specific port"""
     __slots__ = ()
 
 
-class Ping(_AnyNumber):
+class Ping(AnyNumber):
     """How fast you get a response after you've sent out a request"""
     __slots__ = ()
 
 
-class Limit(_SafeRange):
+class Limit(SafeRange):
     """How many proxies to list."""
     __slots__ = ()
     MIN = DEFAULT = 1
     MAX = 20
 
 
-class Uptime(_SafeRange):
+class Uptime(SafeRange):
     """How reliably a proxy has been running"""
     __slots__ = ()
     MIN = 1
     MAX = 100
 
 
-class Country(_SafeCountryCode):
+class Country(SafeCountryCode):
     """Country of the proxy"""
     __slots__ = ()
 
 
-class NotCountry(_SafeCountryCode):
+class NotCountry(SafeCountryCode):
     """Avoid proxy countries"""
     __slots__ = ()

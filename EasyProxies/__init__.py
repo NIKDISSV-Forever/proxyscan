@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import urllib.parse
 import urllib.request
-from typing import Union, Iterable, Generator, Literal
+from typing import Union, Iterable, Generator
 
 from EasyProxies import const
 from EasyProxies._proxy_descriptor import *
@@ -58,18 +58,18 @@ class Proxies:
                                      1 - 100
                                             How reliably a proxy has been running.
 
-        Country ((str | list[str]) | ):
-                                  Example: US, FR
-                                                 Country of the proxy.
+        Country ((str | list[str]) | .const.Country):
+                                                     Example: US, FR
+                                                                    Country of the proxy.
 
-        Not_Country (str | list[str]):
-                                      Example: CN, NL
-                                                     Avoid proxy countries.
+        Not_Country (str | list[str] | .const.NotCountry):
+                                                          Example: CN, NL
+                                                                         Avoid proxy countries.
         """
         return cls.raw_request(_parse_params(kwargs))
 
     @classmethod
-    def raw_request(cls, param: dict[str, Union[str, int]]) -> ProxiesList:
+    def raw_request(cls, param: dict[str, str | int]) -> ProxiesList:
         """The same as the get method, only you need to pass a dictionary"""
         content = _clear_request(f'https://www.proxyscan.io/api/proxy?{urllib.parse.urlencode(param)}')
         try:
@@ -83,14 +83,14 @@ class Proxies:
         return _clear_request(f'https://www.proxyscan.io/download?type={type_}').splitlines()
 
     @classmethod
-    def eternal_generator(cls, **kwargs) -> Generator[Union[OneProxy, Literal[None]], dict[str, Union[str, int]]]:
+    def eternal_generator(cls, **kwargs) -> Generator[Union[OneProxy, None], dict[str, Union[str, int]]]:
         """
         Returns the eternal proxy generator.
         If no proxy is found according to the specified parameters: yield None
         You can pass a dictionary to send to change the proxy parameters.
         """
 
-        def proxy_generator() -> Generator[Union[OneProxy, Literal[None]], dict[str, Union[str, int]]]:
+        def proxy_generator() -> Generator[Union[OneProxy, None], dict[str, Union[str, int]]]:
             params = _parse_params(kwargs)
             while True:
                 proxies = cls.raw_request(params)

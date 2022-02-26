@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 from functools import total_ordering
-from typing import Union, Literal, ForwardRef
+from typing import Union, ForwardRef
 
 __all__ = ('JsonProxy', 'ProxyDescriptor')
 
 from EasyProxies import const
 
-JsonProxy = dict[str, Union[str, int, Literal[None]]]
+JsonProxy = dict[str, Union[str, int, type(None)]]
 
 
 class _AnyDescriptor:
@@ -77,9 +77,13 @@ class ProxyDescriptor(_AnyDescriptor):
                     return {'http': ip, 'https': ip}
         return {protocol: f'{protocol}://{self}' for protocol in TYPE}
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.Host = f'{self.Ip}:{self.Port}'
+
     def __str__(self):
         """Like format='txt'"""
-        return f'{self.Ip}:{self.Port}'
+        return self.Host
 
     def __lt__(self, other: ForwardRef('ProxyDescriptor')) -> bool:
         """Designed for sorting"""

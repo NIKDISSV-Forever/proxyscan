@@ -123,4 +123,4 @@ def _parse_params(params: dict[str]) -> dict[str]:
     return _params
 
 
-def _clear_request(url: str) -> str: return urllib.request.urlopen(url).read().strip().decode('UTF-8')
+def _clear_request(url: str) -> str: return urllib.request.urlopen(url, timeout=15).read().strip().decode('UTF-8')

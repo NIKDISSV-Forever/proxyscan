@@ -6,10 +6,10 @@ with open('README.md', encoding='UTF-8') as fh:
 setup(
     name="EasyProxies",
 
-    version="2.0.0",
+    version="2.0.1",
 
     author="Nikita (NIKDISSV)",
-    author_email="nikdissv.forever@protonmail.com",
+    author_email="nikdissv@proton.me",
 
     description="A simple and quick way to get a proxy.",
     long_description=long_description,
